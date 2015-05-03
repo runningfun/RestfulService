@@ -1,4 +1,4 @@
-package runningfun.restfulservice;
+package runningfun.dto;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
