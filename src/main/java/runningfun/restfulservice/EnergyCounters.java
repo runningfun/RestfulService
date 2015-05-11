@@ -1,6 +1,7 @@
 package runningfun.restfulservice;
 
 import runningfun.dto.GasEnergyValue;
+import runningfun.dto.GasEnergyValueList;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -18,8 +19,8 @@ public class EnergyCounters {
 
     @Path("gas")
     @GET
-    @Produces(MediaType.APPLICATION_XML)
-    public List<GasEnergyValue> getGasEnergyValues() {
+    @Produces({MediaType.APPLICATION_JSON}) //MediaType.APPLICATION_XML,
+    public GasEnergyValueList getGasEnergyValues() {
         System.out.println("getGasEnergyValues");
         List<GasEnergyValue> gasEnergyValueList = new ArrayList<GasEnergyValue>();
         GasEnergyValue gasEnergyValue1 = new GasEnergyValue(new Date(), 850l);
@@ -29,7 +30,10 @@ public class EnergyCounters {
         gasEnergyValueList.add(gasEnergyValue2);
         gasEnergyValueList.add(gasEnergyValue3);
 
-        return gasEnergyValueList;
+        GasEnergyValueList energyValueList = new GasEnergyValueList();
+        energyValueList.setGasEnergyValueList(gasEnergyValueList);
+
+        return energyValueList;
     }
 
     @GET
