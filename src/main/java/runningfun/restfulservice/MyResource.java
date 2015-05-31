@@ -1,5 +1,7 @@
 package runningfun.restfulservice;
 
+import runningfun.dto.Message;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -21,5 +23,12 @@ public class MyResource {
     @Produces(MediaType.TEXT_PLAIN)
     public String getIt() {
         return "Got it!";
+    }
+
+    @Path("message")
+    @GET
+    @Produces(MediaType.APPLICATION_XML)
+    public Message getExampleMessage() {
+        return new Message("Stefan", "news");
     }
 }
