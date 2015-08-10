@@ -1,5 +1,7 @@
 package runningfun.restfulservice;
 
+import com.mongodb.client.FindIterable;
+import org.bson.Document;
 import runningfun.dto.GasEnergyValue;
 import runningfun.dto.GasEnergyValueList;
 
@@ -34,6 +36,14 @@ public class EnergyCounters {
         energyValueList.setGasEnergyValueList(gasEnergyValueList);
 
         return energyValueList;
+    }
+
+    @Path("gasfrommongo")
+    @GET
+    @Produces({MediaType.APPLICATION_JSON}) //MediaType.APPLICATION_XML,
+    public FindIterable<Document> getGasEnergyValuesFromMongo() {
+        System.out.println("getGasEnergyValuesFromMongo");
+        return new ReadValuesFromMongoDB().getValues();
     }
 
     @GET

@@ -9,7 +9,7 @@ $(function () {
     var logged = false;
     var socket = $.atmosphere;
     var request = {
-        url: document.location.toString() + 'chat',
+        url: 'http://localhost:8084/RestfulService/webapi/chat',
         contentType: "application/json",
         logLevel: 'debug',
         transport: 'websocket',
