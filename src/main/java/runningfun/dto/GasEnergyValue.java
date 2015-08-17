@@ -1,44 +1,37 @@
 package runningfun.dto;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.Date;
 
 /**
  * Created by Herschbach.Stefan on 02.05.2015.
  */
 @XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 public class GasEnergyValue {
 
-    @XmlElement
-    private Date meterReadingDate;
-    @XmlElement
-    private long counterReading;
+    private String meterReadingDate;
+    private int meterReadingValue;
 
     public GasEnergyValue() {
     }
 
-    public GasEnergyValue(Date meterReadingDate, long counterReading) {
+    public GasEnergyValue(String meterReadingDate, int meterReadingValue) {
         this.meterReadingDate = meterReadingDate;
-        this.counterReading = counterReading;
+        this.meterReadingValue = meterReadingValue;
     }
 
-    public Date getMeterReadingDate() {
+    public String getMeterReadingDate() {
         return meterReadingDate;
     }
 
-    public void setMeterReadingDate(Date meterReadingDate) {
+    public void setMeterReadingDate(String meterReadingDate) {
         this.meterReadingDate = meterReadingDate;
     }
 
-    public long getCounterReading() {
-        return counterReading;
+    public int getMeterReadingValue() {
+        return meterReadingValue;
     }
 
-    public void setCounterReading(long counterReading) {
-        this.counterReading = counterReading;
+    public void setMeterReadingValue(int meterReadingValue) {
+        this.meterReadingValue = meterReadingValue;
     }
 }

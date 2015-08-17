@@ -5,12 +5,10 @@ import org.bson.Document;
 import runningfun.dto.GasEnergyValue;
 import runningfun.dto.GasEnergyValueList;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,31 +17,37 @@ import java.util.List;
 @Path("energycounter")
 public class EnergyCounters {
 
-    @Path("gas")
-    @GET
-    @Produces({MediaType.APPLICATION_JSON}) //MediaType.APPLICATION_XML,
-    public GasEnergyValueList getGasEnergyValues() {
-        System.out.println("getGasEnergyValues");
-        List<GasEnergyValue> gasEnergyValueList = new ArrayList<GasEnergyValue>();
-        GasEnergyValue gasEnergyValue1 = new GasEnergyValue(new Date(), 850l);
-        GasEnergyValue gasEnergyValue2 = new GasEnergyValue(new Date(), 1000l);
-        GasEnergyValue gasEnergyValue3 = new GasEnergyValue(new Date(), 1600l);
-        gasEnergyValueList.add(gasEnergyValue1);
-        gasEnergyValueList.add(gasEnergyValue2);
-        gasEnergyValueList.add(gasEnergyValue3);
-
-        GasEnergyValueList energyValueList = new GasEnergyValueList();
-        energyValueList.setGasEnergyValueList(gasEnergyValueList);
-
-        return energyValueList;
-    }
-
     @Path("gasfrommongo")
     @GET
     @Produces({MediaType.APPLICATION_JSON}) //MediaType.APPLICATION_XML,
     public FindIterable<Document> getGasEnergyValuesFromMongo() {
         System.out.println("getGasEnergyValuesFromMongo");
-        return new ReadValuesFromMongoDB().getValues();
+        return new MongoDBHandler().getGasValues();
+    }
+
+    @Path("gas")
+    @GET
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public GasEnergyValueList getGasValues() {
+        FindIterable<Document> documents = new MongoDBHandler().getGasValues();
+        GasEnergyValueList gasEnergyValueList = new GasEnergyValueList();
+        List<GasEnergyValue> gasEnergyValues = new ArrayList<GasEnergyValue>();
+        for (Document document : documents) {
+            GasEnergyValue gasEnergyValue = new GasEnergyValue();
+            gasEnergyValue.setMeterReadingDate((String) document.getString("date"));
+            gasEnergyValue.setMeterReadingValue((Integer) document.getInteger("value"));
+            gasEnergyValues.add(gasEnergyValue);
+        }
+        gasEnergyValueList.setGasEnergyValueList(gasEnergyValues);
+        return gasEnergyValueList;
+    }
+
+    @Path("gas")
+    @POST
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response setNewGasValue(GasEnergyValue gasEnergyValue) {
+        new MongoDBHandler().setGasValue(gasEnergyValue.getMeterReadingValue(), gasEnergyValue.getMeterReadingDate());
+        return Response.status(201).build();
     }
 
     @GET
