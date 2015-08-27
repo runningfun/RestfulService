@@ -8,7 +8,10 @@ import runningfun.dto.GasEnergyValueList;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -44,11 +47,24 @@ public class EnergyCounters {
 
     @Path("gas")
     @POST
-    @Consumes({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response setNewGasValue(GasEnergyValue gasEnergyValue) {
         new MongoDBHandler().setGasValue(gasEnergyValue.getMeterReadingValue(), gasEnergyValue.getMeterReadingDate());
         return Response.status(201).build();
     }
+
+    @Path("addgastestvalue")
+    @GET
+    public Response setNewGasTestValue() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-DD hh:mm:ss");
+        Calendar calendar = Calendar.getInstance();
+        Date date = calendar.getTime();
+        String sdfDate = simpleDateFormat.format(date);
+        GasEnergyValue gasEnergyValue = new GasEnergyValue(sdfDate, 6543);
+        new MongoDBHandler().setGasValue(gasEnergyValue.getMeterReadingValue(), gasEnergyValue.getMeterReadingDate());
+        return Response.status(201).build();
+    }
+
 
     @GET
     @Path("test")

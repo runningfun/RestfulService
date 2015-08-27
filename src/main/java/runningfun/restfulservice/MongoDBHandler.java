@@ -34,6 +34,9 @@ public class MongoDBHandler {
     MongoCollection<Document> getGasCollection() {
         MongoClient mongoClient = new MongoClient();
         MongoDatabase db = mongoClient.getDatabase("local");
+        if (db.getCollection("Gas") == null) {
+            db.createCollection("Gas");
+        }
         return db.getCollection("Gas");
     }
 

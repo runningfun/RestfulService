@@ -7,6 +7,8 @@
 
     <p><a href="webapi/energycounter/gasfrommongo">Gas counter from Mongo</a>
 
+    <p><a href="webapi/energycounter/addgastestvalue">Create gas test value</a>
+
     <p><a href="webapi/events">Events</a>
 
     <p><a href="chat.html"> Chat</a>
