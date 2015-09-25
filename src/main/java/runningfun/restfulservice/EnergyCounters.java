@@ -1,6 +1,7 @@
 package runningfun.restfulservice;
 
 import com.mongodb.client.FindIterable;
+import com.mongodb.client.result.DeleteResult;
 import org.bson.Document;
 import runningfun.dto.GasEnergyValue;
 import runningfun.dto.GasEnergyValueList;
@@ -47,16 +48,29 @@ public class EnergyCounters {
 
     @Path("gas")
     @POST
-    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Consumes({MediaType.APPLICATION_JSON})
     public Response setNewGasValue(GasEnergyValue gasEnergyValue) {
+        System.out.println("setNewGasValue " + gasEnergyValue);
         new MongoDBHandler().setGasValue(gasEnergyValue.getMeterReadingValue(), gasEnergyValue.getMeterReadingDate());
         return Response.status(201).build();
+    }
+
+    @Path("gas/{deleteDate}")
+    @DELETE
+    public Response deleteGasEntry(@PathParam("deleteDate") String deleteDate) {
+        System.out.println("delete gas entry for date " + deleteDate);
+        DeleteResult deleteResult = new MongoDBHandler().removeGasEntry(deleteDate);
+        if (deleteResult.getDeletedCount() == 0) {
+            return Response.status(304).build();
+        } else {
+            return Response.status(202).build();
+        }
     }
 
     @Path("addgastestvalue")
     @GET
     public Response setNewGasTestValue() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-DD hh:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         Calendar calendar = Calendar.getInstance();
         Date date = calendar.getTime();
         String sdfDate = simpleDateFormat.format(date);
