@@ -1,9 +1,11 @@
 package runningfun.restfulservice;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
+import com.mongodb.client.FindIterable;
+import org.bson.Document;
+import runningfun.metrics.MetricsListener;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
@@ -12,11 +14,28 @@ import javax.ws.rs.core.Response;
 @Path("dhtservice")
 public class DHTService {
 
+    @GET
+    @Path("temperature")
+    @Produces({MediaType.APPLICATION_JSON})
+    public FindIterable<Document> getTemperatures() {
+        System.out.println("getGasEnergyValuesFromMongo");
+        return new MongoDBHandler().getTemperatureValues();
+    }
+
+    @GET
+    @Path("temperature/{number}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public FindIterable<Document> getTemperatures(@PathParam("number") int number) {
+        System.out.println("get last " + number + " temperature values");
+        return new MongoDBHandler().getTemperatureValues(number);
+    }
 
     @POST
     @Path("temperature")
     public Response createTemperatureValue(@QueryParam("value") double temperatureValue) {
         System.out.println("temperatureValue received " + temperatureValue);
+        long tempAsLong = Math.round(temperatureValue);
+        MetricsListener.temperatureMeter.mark(tempAsLong);
         new MongoDBHandler().createTemperatureValue(temperatureValue);
         return Response.status(201).build();
     }
@@ -25,6 +44,8 @@ public class DHTService {
     @Path("humidity")
     public Response createHumidityValue(@QueryParam("value") double humidityValue) {
         System.out.println("humidityValue received " + humidityValue);
+        long humidityAsLong = Math.round(humidityValue);
+        MetricsListener.humidityMeter.mark(humidityAsLong);
         new MongoDBHandler().createHumidityValue(humidityValue);
         return Response.status(201).build();
     }

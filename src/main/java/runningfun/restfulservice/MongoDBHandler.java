@@ -16,9 +16,24 @@ import java.util.Date;
  */
 public class MongoDBHandler {
 
+    private static MongoCollection<Document> gasCollection;
+    private static MongoCollection<Document> temperatureCollection;
+    private static MongoCollection<Document> humidityCollection;
+
+    static synchronized MongoCollection<Document> getGasCollection() {
+        if (gasCollection == null) {
+            MongoClient mongoClient = new MongoClient();
+            MongoDatabase db = mongoClient.getDatabase("local");
+            if (db.getCollection("Gas") == null) {
+                db.createCollection("Gas");
+            }
+            gasCollection = db.getCollection("Gas");
+        }
+        return gasCollection;
+    }
+
     public FindIterable<Document> getGasValues() {
-        MongoCollection<Document> gasCollection = getGasCollection();
-        FindIterable<Document> iterable = gasCollection.find();
+        FindIterable<Document> iterable = getGasCollection().find();
         iterable.forEach(new Block<Document>() {
             @Override
             public void apply(final Document document) {
@@ -32,32 +47,28 @@ public class MongoDBHandler {
         getGasCollection().insertOne(createNewGasEntry(gasValue, date));
     }
 
-
-    MongoCollection<Document> getGasCollection() {
-        MongoClient mongoClient = new MongoClient();
-        MongoDatabase db = mongoClient.getDatabase("local");
-        if (db.getCollection("Gas") == null) {
-            db.createCollection("Gas");
-        }
-        return db.getCollection("Gas");
-    }
-
     MongoCollection<Document> getTemperatureCollection() {
-        MongoClient mongoClient = new MongoClient();
-        MongoDatabase db = mongoClient.getDatabase("local");
-        if (db.getCollection("Temperature") == null) {
-            db.createCollection("Temperature");
+        if (temperatureCollection == null) {
+            MongoClient mongoClient = new MongoClient();
+            MongoDatabase db = mongoClient.getDatabase("local");
+            if (db.getCollection("Temperature") == null) {
+                db.createCollection("Temperature");
+            }
+            temperatureCollection = db.getCollection("Temperature");
         }
-        return db.getCollection("Temperature");
+        return temperatureCollection;
     }
 
     MongoCollection<Document> getHumidityCollection() {
-        MongoClient mongoClient = new MongoClient();
-        MongoDatabase db = mongoClient.getDatabase("local");
-        if (db.getCollection("Humidity") == null) {
-            db.createCollection("Humidity");
+        if (humidityCollection == null) {
+            MongoClient mongoClient = new MongoClient();
+            MongoDatabase db = mongoClient.getDatabase("local");
+            if (db.getCollection("Humidity") == null) {
+                db.createCollection("Humidity");
+            }
+            humidityCollection = db.getCollection("Humidity");
         }
-        return db.getCollection("Humidity");
+        return humidityCollection;
     }
 
 
@@ -87,5 +98,22 @@ public class MongoDBHandler {
 
     public void createHumidityValue(double humidityValue) {
         getHumidityCollection().insertOne(new Document("date", new Date()).append("value", humidityValue));
+    }
+
+    public FindIterable<Document> getTemperatureValues() {
+        FindIterable<Document> documents = getTemperatureCollection().find();
+//        iterable.forEach(new Block<Document>() {
+//            @Override
+//            public void apply(final Document document) {
+//                System.out.println(document);
+//            }
+//        });
+        return documents;
+    }
+
+    public FindIterable<Document> getTemperatureValues(int number) {
+
+        FindIterable<Document> documents = getTemperatureCollection().find().sort(new Document("_id", -1)).limit(number);
+        return documents;
     }
 }
