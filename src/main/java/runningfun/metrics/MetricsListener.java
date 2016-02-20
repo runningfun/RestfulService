@@ -21,14 +21,36 @@ import java.util.concurrent.TimeUnit;
  */
 public class MetricsListener implements ServletContextListener {
     public static MetricRegistry metricsRegistry = new MetricRegistry();
-    public static Meter temperatureMeter = metricsRegistry.meter("temperature");
-    public static Meter humidityMeter = metricsRegistry.meter("humidity");
+    //    public static Meter temperatureMeter = metricsRegistry.meter("temperature");
+//    public static Meter humidityMeter = metricsRegistry.meter("humidity");
+    static double lastTemperaturValue;
+    static double lastHumidityValue;
     private final Logger logger = LoggerFactory.getLogger(MetricsListener.class);
     public Graphite graphite = new Graphite(new InetSocketAddress("192.168.188.45", 2003));
     //public   Graphite graphite = new Graphite(new InetSocketAddress("192.168.188.51", 2003));
     //   public ConsoleReporter consoleReporter;
     public GraphiteReporter graphiteReporter;
+    Gauge tempGauge = MetricsListener.metricsRegistry.register("temperature", new Gauge() {
+        @Override
+        public Object getValue() {
+            return lastTemperaturValue;
+        }
+    });
+    Gauge humidityGauge = MetricsListener.metricsRegistry.register("humidity", new Gauge() {
+        @Override
+        public Object getValue() {
+            return lastHumidityValue;
+        }
+    });
     private String metricsPrefix = "runningfun.sensors";
+
+    public static void setLastTemperaturValue(double lastTemperaturValue) {
+        MetricsListener.lastTemperaturValue = lastTemperaturValue;
+    }
+
+    public static void setLastHumidityValue(double lastHumidityValue) {
+        MetricsListener.lastHumidityValue = lastHumidityValue;
+    }
 
     void init() {
 //        startConsoleReport();
@@ -36,14 +58,6 @@ public class MetricsListener implements ServletContextListener {
         registerAll(".jvm.tomcat.threads", new ThreadStatesGaugeSet(), metricsRegistry);
         registerAll(".jvm.tomcat.memory", new MemoryUsageGaugeSet(), metricsRegistry);
     }
-
-//    void startConsoleReport() {
-//        consoleReporter = ConsoleReporter.forRegistry(metricsRegistry)
-//                .convertRatesTo(TimeUnit.SECONDS)
-//                .convertDurationsTo(TimeUnit.MILLISECONDS)
-//                .build();
-//        consoleReporter.start(1, TimeUnit.MINUTES);
-//    }
 
     void startGraphiteReporter() {
         graphiteReporter = GraphiteReporter.forRegistry(metricsRegistry)
@@ -85,8 +99,8 @@ public class MetricsListener implements ServletContextListener {
 //        consoleReporter=null;
         graphiteReporter = null;
         graphite = null;
-        temperatureMeter = null;
-        humidityMeter = null;
+//        temperatureMeter = null;
+//        humidityMeter = null;
         metricsRegistry = null;
 
 

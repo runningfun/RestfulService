@@ -34,8 +34,7 @@ public class DHTService {
     @Path("temperature")
     public Response createTemperatureValue(@QueryParam("value") double temperatureValue) {
         System.out.println("temperatureValue received " + temperatureValue);
-        long tempAsLong = Math.round(temperatureValue);
-        MetricsListener.temperatureMeter.mark(tempAsLong);
+        MetricsListener.setLastTemperaturValue(temperatureValue);
         new MongoDBHandler().createTemperatureValue(temperatureValue);
         return Response.status(201).build();
     }
@@ -44,8 +43,7 @@ public class DHTService {
     @Path("humidity")
     public Response createHumidityValue(@QueryParam("value") double humidityValue) {
         System.out.println("humidityValue received " + humidityValue);
-        long humidityAsLong = Math.round(humidityValue);
-        MetricsListener.humidityMeter.mark(humidityAsLong);
+        MetricsListener.setLastHumidityValue(humidityValue);
         new MongoDBHandler().createHumidityValue(humidityValue);
         return Response.status(201).build();
     }
